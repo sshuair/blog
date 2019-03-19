@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2"/>
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1"/>
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/favicon-16x16-next.png?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false,"dimmer":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近的工作内容一直围绕着机器学习展开，断断续续看了不少教程，这里正好拿着kaggle的House Prices: Advanced Regression Techniques练练手，总结一下机器学习的大致流程。  Data Exploration看了许多教程和机器学习的经验，都提到过一句话：搞机器学习，对数据和业务的认识很重要，所以下面就先来看看数据长什么样子，以及数据可视化中常用的方法和工具，p">
+<meta name="keywords" content="kaggle,machine learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kaggle入门之旅：house prices">
+<meta property="og:url" content="https://sshuair.xyz/2017/03/11/kaggle-house-prices/index.html">
+<meta property="og:site_name" content="sshuair&#39;s notes">
+<meta property="og:description" content="最近的工作内容一直围绕着机器学习展开，断断续续看了不少教程，这里正好拿着kaggle的House Prices: Advanced Regression Techniques练练手，总结一下机器学习的大致流程。  Data Exploration看了许多教程和机器学习的经验，都提到过一句话：搞机器学习，对数据和业务的认识很重要，所以下面就先来看看数据长什么样子，以及数据可视化中常用的方法和工具，p">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://kaggle2.blob.core.windows.net/competitions/kaggle/5407/media/housesbanner.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_12_1.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_14_1.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_17_1.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_19_0.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_24_0.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_25_1.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_27_0.png">
+<meta property="og:image" content="https://sshuair.xyz/images/kaggle-house-price/output_49_0.png">
+<meta property="og:updated_time" content="2018-03-04T12:49:54.786Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kaggle入门之旅：house prices">
+<meta name="twitter:description" content="最近的工作内容一直围绕着机器学习展开，断断续续看了不少教程，这里正好拿着kaggle的House Prices: Advanced Regression Techniques练练手，总结一下机器学习的大致流程。  Data Exploration看了许多教程和机器学习的经验，都提到过一句话：搞机器学习，对数据和业务的认识很重要，所以下面就先来看看数据长什么样子，以及数据可视化中常用的方法和工具，p">
+<meta name="twitter:image" content="https://kaggle2.blob.core.windows.net/competitions/kaggle/5407/media/housesbanner.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://sshuair.xyz/2017/03/11/kaggle-house-prices/"/>
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>kaggle入门之旅：house prices | sshuair's notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sshuair's notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">书写是为了更好的思考</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br/>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br/>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br/>关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sshuair.xyz/2017/03/11/kaggle-house-prices/"/>
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sshuair"/>
+      <meta itemprop="description" content=""/>
+      <meta itemprop="image" content="/images/avatar.gif"/>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sshuair's notes"/>
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">kaggle入门之旅：house prices
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-03-11 17:15:15" itemprop="dateCreated datePublished" datetime="2017-03-11T17:15:15+08:00">2017-03-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-03-04 20:49:54" itemprop="dateModified" datetime="2018-03-04T20:49:54+08:00">2018-03-04</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近的工作内容一直围绕着机器学习展开，断断续续看了不少教程，这里正好拿着kaggle的<a href="https://www.kaggle.com/c/house-prices-advanced-regression-techniques" target="_blank" rel="noopener">House Prices: Advanced Regression Techniques</a>练练手，总结一下机器学习的大致流程。</p>
+<p><img src="https://kaggle2.blob.core.windows.net/competitions/kaggle/5407/media/housesbanner.png" alt=""></p>
+<h1 id="Data-Exploration"><a href="#Data-Exploration" class="headerlink" title="Data Exploration"></a>Data Exploration</h1><p>看了许多教程和机器学习的经验，都提到过一句话：<strong>搞机器学习，对数据和业务的认识很重要</strong>，所以下面就先来看看数据长什么样子，以及数据可视化中常用的方法和工具，python中数据的读取以及处理的瑞士军刀非pandas莫属，而可视化有matplotlib和seaborn两个方便的工具</p>
+<a id="more"></a>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br></pre></td></tr></table></figure>
+<h2 id="Loading-Data"><a href="#Loading-Data" class="headerlink" title="Loading Data"></a>Loading Data</h2><p>这里直接将train data和test data放到一个DataFrame中，方便后面做哑编码时train和test对应关系乱掉，当然也可以只用train data进行分析，这里只是为了后面预处理的时候方便些</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df_train = pd.read_csv(<span class="string">'train.csv'</span>,index_col=<span class="number">0</span>)</span><br><span class="line">df_test = pd.read_csv(<span class="string">'test.csv'</span>,index_col=<span class="number">0</span>)</span><br><span class="line">df_features = pd.concat([df_train, df_test], keys=[<span class="string">'train'</span>, <span class="string">'test'</span>])</span><br></pre></td></tr></table></figure>
+<h2 id="Basic-Info"><a href="#Basic-Info" class="headerlink" title="Basic Info"></a>Basic Info</h2><p>pandas中有几个常用的方法可以查看数据的整体情况：</p>
+<ul>
+<li><strong>DataFrame.head()</strong> : 查看DataFrame的开头几行，对数据有个大概了解</li>
+<li><strong>DataFrame.describe()</strong> : 查看DataFrame中数值型数据的基本统计信息，包括数量、均值、方差、最大最小值、百分位数</li>
+<li><strong>DataFrame.info()</strong> : 查看DataFrame中每个字段的数据缺失情况，以及字段的数据类型</li>
+<li><strong>DataFrame.get_dtype_counts()</strong> : 各个数据类型的个数</li>
+<li><strong>DataFrame.shape</strong>: 数据的维度，即样本量和特征个数</li>
+<li><strong>DataFrame.size</strong>: 数据个数，也就是【样本量*特征个数】</li>
+</ul>
+<p>对于本例的房价数据，用以上方法可以看到数据共有80个特征，其中有43个是category类型（需要哑编码），34个是整型，另外3个是float类型。</p>
+<h2 id="Checking-for-NANs"><a href="#Checking-for-NANs" class="headerlink" title="Checking for NANs"></a>Checking for NANs</h2><p>对于机器学习来说，对NAN的处理是非常重要的，NAN不处理掉，后面都无法训练数据。先来瞅一眼train和test中各个特征的缺失率，从下表可以看到，PoolQC、MiscFeature、Alley、Fence这几个特征的缺失率特别的高，FireplaceQu也达到了50左右，在预处理的时候可以考虑将这几个特征删除掉</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">NANs = pd.concat([df_train.dtypes, df_train.isnull().sum(), df_train.isnull().sum()/df_train.shape[<span class="number">0</span>], </span><br><span class="line">                  df_test.isnull().sum(), df_test.isnull().sum()/df_test.shape[<span class="number">0</span>]], </span><br><span class="line">                 axis = <span class="number">1</span>, keys=[<span class="string">'dtype'</span>,<span class="string">'Train'</span>, <span class="string">'Train_percentage'</span>, <span class="string">'Test'</span>, <span class="string">'Test_percentage'</span>])</span><br><span class="line">NANs_sort = NANs.sort_values([<span class="string">'Train_percentage'</span>,<span class="string">'Test_percentage'</span>], axis=<span class="number">0</span>, ascending=<span class="keyword">False</span>)</span><br><span class="line"><span class="comment"># NANs_sort[(NANs_sort.Train&gt;0) | (NANs_sort.Test&gt;0)] #print the NAN count greater than zero</span></span><br><span class="line">NANs_sort</span><br></pre></td></tr></table></figure>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dtype</td>
+<td>Train</td>
+<td>Train_percentage</td>
+<td>Test</td>
+<td>Test_percentage</td>
+<td></td>
+</tr>
+<tr>
+<td>PoolQC</td>
+<td>object</td>
+<td>1453</td>
+<td>0.995205</td>
+<td>1456.0</td>
+<td>0.997944</td>
+</tr>
+<tr>
+<td>MiscFeature</td>
+<td>object</td>
+<td>1406</td>
+<td>0.963014</td>
+<td>1408.0</td>
+<td>0.965045</td>
+</tr>
+<tr>
+<td>Alley</td>
+<td>object</td>
+<td>1369</td>
+<td>0.937671</td>
+<td>1352.0</td>
+<td>0.926662</td>
+</tr>
+<tr>
+<td>Fence</td>
+<td>object</td>
+<td>1179</td>
+<td>0.807534</td>
+<td>1169.0</td>
+<td>0.801234</td>
+</tr>
+<tr>
+<td>FireplaceQu</td>
+<td>object</td>
+<td>690</td>
+<td>0.472603</td>
+<td>730.0</td>
+<td>0.500343</td>
+</tr>
+<tr>
+<td>LotFrontage</td>
+<td>float64</td>
+<td>259</td>
+<td>0.177397</td>
+<td>227.0</td>
+<td>0.155586</td>
+</tr>
+<tr>
+<td>GarageCond</td>
+<td>object</td>
+<td>81</td>
+<td>0.055479</td>
+<td>78.0</td>
+<td>0.053461</td>
+</tr>
+<tr>
+<td>GarageFinish</td>
+<td>object</td>
+<td>81</td>
+<td>0.055479</td>
+<td>78.0</td>
+<td>0.053461</td>
+</tr>
+<tr>
+<td>GarageQual</td>
+<td>object</td>
+<td>81</td>
+<td>0.055479</td>
+<td>78.0</td>
+<td>0.053461</td>
+</tr>
+<tr>
+<td>GarageYrBlt</td>
+<td>float64</td>
+<td>81</td>
+<td>0.055479</td>
+<td>78.0</td>
+<td>0.053461</td>
+</tr>
+<tr>
+<td>GarageType</td>
+<td>object</td>
+<td>81</td>
+<td>0.055479</td>
+<td>76.0</td>
+<td>0.052090</td>
+</tr>
+<tr>
+<td>BsmtExposure</td>
+<td>object</td>
+<td>38</td>
+<td>0.026027</td>
+<td>44.0</td>
+<td>0.030158</td>
+</tr>
+<tr>
+<td>BsmtFinType2</td>
+<td>object</td>
+<td>38</td>
+<td>0.026027</td>
+<td>42.0</td>
+<td>0.028787</td>
+</tr>
+<tr>
+<td>BsmtCond</td>
+<td>object</td>
+<td>37</td>
+<td>0.025342</td>
+<td>45.0</td>
+<td>0.030843</td>
+</tr>
+<tr>
+<td>BsmtQual</td>
+<td>object</td>
+<td>37</td>
+<td>0.025342</td>
+<td>44.0</td>
+<td>0.030158</td>
+</tr>
+<tr>
+<td>BsmtFinType1</td>
+<td>object</td>
+<td>37</td>
+<td>0.025342</td>
+<td>42.0</td>
+<td>0.028787</td>
+</tr>
+<tr>
+<td>MasVnrType</td>
+<td>object</td>
+<td>8</td>
+<td>0.005479</td>
+<td>16.0</td>
+<td>0.010966</td>
+</tr>
+<tr>
+<td>MasVnrArea</td>
+<td>float64</td>
+<td>8</td>
+<td>0.005479</td>
+<td>15.0</td>
+<td>0.010281</td>
+</tr>
+<tr>
+<td>Electrical</td>
+<td>object</td>
+<td>1</td>
+<td>0.000685</td>
+<td>0.0</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>MSZoning</td>
+<td>object</td>
+<td>0</td>
+<td>0.000000</td>
+<td>4.0</td>
+<td>0.002742</td>
+</tr>
+<tr>
+<td>BsmtFullBath</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>2.0</td>
+<td>0.001371</td>
+</tr>
+<tr>
+<td>BsmtHalfBath</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>2.0</td>
+<td>0.001371</td>
+</tr>
+<tr>
+<td>Functional</td>
+<td>object</td>
+<td>0</td>
+<td>0.000000</td>
+<td>2.0</td>
+<td>0.001371</td>
+</tr>
+<tr>
+<td>Utilities</td>
+<td>object</td>
+<td>0</td>
+<td>0.000000</td>
+<td>2.0</td>
+<td>0.001371</td>
+</tr>
+<tr>
+<td>BsmtFinSF1</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>BsmtFinSF2</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>BsmtUnfSF</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>Exterior1st</td>
+<td>object</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>Exterior2nd</td>
+<td>object</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>GarageArea</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>1.0</td>
+<td>0.000685</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>MSSubClass</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>MiscVal</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>SalePrice</td>
+<td>int64</td>
+<td>0</td>
+<td>0.000000</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="Data-Visualization"><a href="#Data-Visualization" class="headerlink" title="Data Visualization"></a>Data Visualization</h2><p><strong>0. target visualization</strong></p>
+<p>拿到一个机器学习任务，首先看看其目标变量长生么样子，对于预测任务，可以通过<code>seaborn.distplot</code>查看其直方图，对于分类任务可以用<code>seaborn.countplot</code>来查看各个分类的数量情况</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sns.distplot(df_train.SalePrice)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11e51f550&gt;
+</code></pre><p><img src="/images/kaggle-house-price/output_12_1.png" alt="png"></p>
+<p>房价预测这个例子中要求使用对目标变量求log之后计算RMSE，那么再来看看取log之后的分布情况：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sns.distplot(np.log(df_train.SalePrice))</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x115c21c10&gt;
+</code></pre><p><img src="/images/kaggle-house-price/output_14_1.png" alt="png"></p>
+<p>在一个机器学习任务中，通常会有多种数据类型，主要可以分为两类：<strong>numerical type</strong>和<strong>categorical type</strong>，对于两种类型的数据需要才有用不同的可视化方法去查看其分布规律，seaborn中对于两种数据类型都提供了简便的可视化方法。</p>
+<p><strong>1. numeric type visualization</strong></p>
+<p>对于<strong>numerical type</strong>，我们比较关心的是每个特征与目标变量，特征与特征之间的关系以及分布情况，同时采用散点图的方式，可以直观的查看出异常点。seaborn中常用的numerical type可视化方法有：<code>pairplot</code>,<code>jointplot</code>, <code>lmplot</code>等等。对于<code>pairplot</code>，如果特征特别多（如本例），不建议一起绘制出来，那样速度太慢，分开绘制会比较好。这里简单的列举几个特征与目标变量Y之间的散点图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">numeric_columns = df_train.dtypes[df_train.dtypes != <span class="string">'object'</span>].index  <span class="comment">#get the numeric columns for visualization</span></span><br><span class="line"><span class="comment"># numeric_columns = numeric_columns.drop(['SalePrice']) #drop the target column</span></span><br><span class="line"></span><br><span class="line">sns.pairplot(df_train[[<span class="string">'LotArea'</span>, <span class="string">'KitchenAbvGr'</span>,<span class="string">'MasVnrArea'</span>,<span class="string">'SalePrice'</span>]].dropna())  <span class="comment">#如果feature数量比较少，可以直接用numeric_columns</span></span><br><span class="line"><span class="comment"># 注：这里seaborn自带的dropna不起作用，详见：https://github.com/mwaskom/seaborn/issues/1087</span></span><br></pre></td></tr></table></figure>
+<pre><code>&lt;seaborn.axisgrid.PairGrid at 0x11f0bdf10&gt;
+</code></pre><p><img src="/images/kaggle-house-price/output_17_1.png" alt="png"></p>
+<p><strong>2. numeric与target相关系数</strong></p>
+<p>通过相关系数（皮尔逊相关系数）可视化关系图，可以numeric type的特征之间的关联程度，包括以target、各个feature之间的关联程度，虽然没有上面的散点图直观，当时可以纵观全局，并且有具体的数值，再通过上面的散点图（pairplot）以及线性回归图（lmplot）探索变量间的具体情况</p>
+<p>在选特征或者后续处理中，应该选择与目标变量相关系数高的特征，特征之间的相关系数如果比较高，那么需要考虑<strong>降维</strong>处理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">corrmat = df_train[numeric_columns].corr()</span><br><span class="line">lm = sns.heatmap(corrmat,vmax=<span class="number">1</span>, linewidths=<span class="number">0.01</span>, square=<span class="keyword">True</span>,annot=<span class="keyword">True</span>,cmap=<span class="string">'viridis'</span>,linecolor=<span class="string">"white"</span>)</span><br><span class="line">lm.figure.set_size_inches(<span class="number">25</span>,<span class="number">25</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/kaggle-house-price/output_19_0.png" alt="png"></p>
+<p><strong>3. categorical type visualization</strong></p>
+<p>打印每个category的类别名称以及类别数量</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">category_columns = df_train.dtypes[df_train.dtypes == <span class="string">'object'</span>].index</span><br><span class="line"><span class="comment"># df_train[category_columns].apply(pd.value_counts)  #若果feature数量比较少，可以用这种方式</span></span><br><span class="line"><span class="keyword">for</span> idx, item <span class="keyword">in</span> enumerate(category_columns):</span><br><span class="line">    print(<span class="string">'feature: &#123;0&#125; value counts:\n&#123;1&#125; \n'</span>.format(item,df_train[item].value_counts()))</span><br></pre></td></tr></table></figure>
+<pre><code>feature: MSZoning value counts:
+RL         1151
+RM          218
+FV           65
+RH           16
+C (all)      10
+Name: MSZoning, dtype: int64 
+
+feature: Street value counts:
+Pave    1454
+Grvl       6
+Name: Street, dtype: int64 
+
+feature: Alley value counts:
+Grvl    50
+Pave    41
+Name: Alley, dtype: int64 
+
+feature: LotShape value counts:
+Reg    925
+IR1    484
+IR2     41
+IR3     10
+Name: LotShape, dtype: int64 
+
+feature: LandContour value counts:
+Lvl    1311
+Bnk      63
+HLS      50
+Low      36
+Name: LandContour, dtype: int64 
+
+feature: Utilities value counts:
+AllPub    1459
+NoSeWa       1
+Name: Utilities, dtype: int64 
+
+....
+</code></pre><p>可视化categorical type中每个feature与target的分布关系，需要一个一个可视化，最常用的方式当属<code>seaborn.swarmplot</code>和<code>seaborn.boxplot</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">category_columns = df_train.dtypes[df_train.dtypes == <span class="string">'object'</span>].index</span><br><span class="line">sns.swarmplot(x=<span class="string">"BsmtFinType1"</span>, y=<span class="string">"SalePrice"</span>, data=df_train);</span><br></pre></td></tr></table></figure>
+<p><img src="/images/kaggle-house-price/output_24_0.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sns.boxplot(x=<span class="string">"BsmtFinType1"</span>, y=<span class="string">"SalePrice"</span>, data=df_train)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11b1cd210&gt;
+</code></pre><p><img src="/images/kaggle-house-price/output_25_1.png" alt="png"></p>
+<p><strong>4. visualize relation between each feature and target</strong></p>
+<p>通过上面整体的对数据进行一些洞察之后，我们可以挑选比较重要的数据进行分析，看看其与target之间的具体关系</p>
+<p>比如OverallQual与价格的皮尔逊相关系数高达0.79，可以拿出来具体看看</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sns.jointplot(x=<span class="string">"OverallQual"</span>, y=<span class="string">"SalePrice"</span>, data=df_train, kind=<span class="string">"reg"</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="/images/kaggle-house-price/output_27_0.png" alt="png"></p>
+<hr>
+<h1 id="Data-Preprocessing"><a href="#Data-Preprocessing" class="headerlink" title="Data Preprocessing"></a>Data Preprocessing</h1><p>Data Preprocessing理论上应当归于与Feature Engineering，而特征工程包括了太多的内容，这里主要讲一下其中的预处理部分，等以后经验多了在总结总结特征工程这一部分。</p>
+<p>数据预处理这一步，很大程度上依赖于前面的Data Exploration，常见的处理过程有：</p>
+<ul>
+<li>Missing Data: 缺失值处理</li>
+<li>Outlier: 异常值/离群点</li>
+<li>Encoding: categorical type 编码</li>
+</ul>
+<h2 id="Missing-Data"><a href="#Missing-Data" class="headerlink" title="Missing Data"></a>Missing Data</h2><p>这里采用简单的填充方式，用均值、众数、中位数等形式填充，更好的方法应该结合每个feature的特点去填充相应的missing data</p>
+<p><strong>1. 删除NAN特别多的字段</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df_features.drop([<span class="string">'PoolQC'</span>,<span class="string">'MiscFeature'</span>,<span class="string">'Alley'</span>,<span class="string">'Fence'</span>],axis=<span class="number">1</span>,inplace=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>2. fill NAN(categorical type)</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> df_features.dtypes[df_features.dtypes == <span class="string">'object'</span>].index:</span><br><span class="line">    mode = df_features[item].mode()[<span class="number">0</span>]</span><br><span class="line">    df_features[item].fillna(mode,inplace=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>3. fill NAN(numerical type)</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> df_features.dtypes[df_features.dtypes == <span class="string">'float64'</span>].index:</span><br><span class="line">    mode = df_features[item].mean()</span><br><span class="line">    df_features[item].fillna(mode,inplace=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="encoding-categorical-features"><a href="#encoding-categorical-features" class="headerlink" title="encoding categorical features"></a>encoding categorical features</h2><p>对于<a href="https://en.wikipedia.org/wiki/Categorical_variable" target="_blank" rel="noopener">categorical type</a>，是无法直接用于训练模型的，需要进一步处理成数值型，才可以用于后续操作。常用的encoding方式有两种：<strong>LabelEncoder</strong>、<strong>OneHotEncoder</strong>，sklearn中对这两种方式都做了实现，pandas中用get_dummies方法实现。在机器学习中用的最多的是哑编码（也就是Dummy coding或OneHotEncoder）, 当然如果某个特征的取值有成百上千个，用Dummy coding这种方式显然就不合适了，最好的方式是用LabelEncoder，或者更具这个特征的分布特征，把重要的几个取值和剩余的取值进行哑编码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pandas方式</span></span><br><span class="line">df_features_encode = pd.get_dummies(df_features)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># sklearn方式</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> OneHotEncoder</span><br><span class="line">enc = OneHotEncoder()</span><br><span class="line">enc.fit([[<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>], [<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>], [<span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>]])</span><br><span class="line"></span><br><span class="line"><span class="comment"># enc.fit_transform(df_train)</span></span><br></pre></td></tr></table></figure>
+<pre><code>OneHotEncoder(categorical_features=&#39;all&#39;, dtype=&lt;type &#39;numpy.float64&#39;&gt;,
+       handle_unknown=&#39;error&#39;, n_values=&#39;auto&#39;, sparse=True)
+</code></pre><hr>
+<h1 id="Training-Model"><a href="#Training-Model" class="headerlink" title="Training Model"></a>Training Model</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> hyperopt <span class="keyword">import</span> STATUS_OK, Trials, fmin, hp, tpe</span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> metrics, linear_model</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_selection <span class="keyword">import</span> SelectKBest,f_regression</span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> ensemble, svm, preprocessing</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split, GridSearchCV, cross_val_score</span><br></pre></td></tr></table></figure>
+<p>prepare the trainning data</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">y_train = df_features_encode.loc[<span class="string">'train'</span>,[<span class="string">'SalePrice'</span>]]</span><br><span class="line">y_train = np.log(y_train[<span class="string">'SalePrice'</span>])</span><br><span class="line">X_train = df_features_encode.loc[<span class="string">'train'</span>,:].copy()</span><br><span class="line">X_train.drop(<span class="string">'SalePrice'</span>, axis=<span class="number">1</span>, inplace=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Feature-Selection"><a href="#Feature-Selection" class="headerlink" title="Feature Selection"></a>Feature Selection</h2><p>如果参数太多，也可以通过SelectKBest选出最相关的参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X_new = SelectKBest(f_regression, k=<span class="number">20</span>).fit_transform(X_train, y_train)</span><br></pre></td></tr></table></figure>
+<h2 id="Tuning-Parameters"><a href="#Tuning-Parameters" class="headerlink" title="Tuning Parameters"></a>Tuning Parameters</h2><p>调参是搞机器学习的人最津津乐道的部分，调参的方式有很多种，可以自己手动设置参数范围，用for循环来调参，不过这总方式太原始了，sklearn中提供了<a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" target="_blank" rel="noopener">GridSearchCV</a>和<a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.RandomizedSearchCV.html" target="_blank" rel="noopener">RandomizedSearchCV</a>两种调参方法，不过这里我们采用另一更好的调参方法：hyperopt，相比sklearn提供的两种方法更加高效，同时也提供了更加方便的参数输出结构，方便可视化参数结果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">space = &#123;</span><br><span class="line">    <span class="string">""</span></span><br><span class="line">    <span class="string">"max_features"</span>: hp.quniform(<span class="string">"max_features"</span>, <span class="number">0.05</span>,<span class="number">1</span>,<span class="number">0.1</span>),</span><br><span class="line">    <span class="string">'n_estimators'</span>: hp.choice(<span class="string">'n_estimators'</span>, range(<span class="number">1</span>,<span class="number">500</span>)),</span><br><span class="line">    <span class="string">"min_samples_leaf"</span>: hp.choice(<span class="string">"min_samples_leaf"</span>, range(<span class="number">1</span>,<span class="number">10</span>))</span><br><span class="line"><span class="comment">#     "alpha" : hp.choice("alpha",[0.05, 0.1, 0.3, 1, 3, 5, 10, 15, 30, 50, 75])</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rmse</span><span class="params">(y_true, y_pred)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> np.sqrt(metrics.mean_squared_error(y_true, y_pred))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mape</span><span class="params">(y_true, y_pred)</span>:</span> </span><br><span class="line">    mask = y_true &gt; <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask]))</span><br><span class="line"></span><br><span class="line">loss_func = metrics.make_scorer(rmse, greater_is_better=<span class="keyword">False</span>) <span class="comment">#定义损失函数</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(params)</span>:</span></span><br><span class="line">    clf = ensemble.RandomForestRegressor(**params)</span><br><span class="line"><span class="comment">#     clf = linear_model.Ridge(**params)</span></span><br><span class="line">    score = np.mean(cross_val_score(clf, X=X_train, y=y_train, scoring=loss_func))</span><br><span class="line">    <span class="keyword">return</span> score</span><br><span class="line"></span><br><span class="line">best_score = <span class="number">-100</span>**<span class="number">10</span></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">objective</span><span class="params">(params)</span>:</span></span><br><span class="line">    <span class="keyword">global</span> best_score, count</span><br><span class="line">    count += <span class="number">1</span></span><br><span class="line">    acc = train_model(params)</span><br><span class="line">    <span class="keyword">if</span> acc &gt; best_score:</span><br><span class="line">        best_score = acc</span><br><span class="line">    print(str(count) + <span class="string">': new best:'</span>, best_score, params)</span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">'loss'</span>: -acc, <span class="string">'status'</span>: STATUS_OK&#125;</span><br><span class="line">    </span><br><span class="line">trials = Trials()</span><br><span class="line">best = fmin(objective, space=space, algo=tpe.suggest, max_evals=<span class="number">100</span>, trials=trials)</span><br><span class="line">print(<span class="string">'\n best param: '</span>, best)</span><br></pre></td></tr></table></figure>
+<pre><code>1: new best: -0.141484028235 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 366, &#39;min_samples_leaf&#39;: 3}
+2: new best: -0.141484028235 {&#39;max_features&#39;: 1.0, &#39;n_estimators&#39;: 463, &#39;min_samples_leaf&#39;: 2}
+3: new best: -0.141484028235 {&#39;max_features&#39;: 0.2, &#39;n_estimators&#39;: 446, &#39;min_samples_leaf&#39;: 3}
+4: new best: -0.141484028235 {&#39;max_features&#39;: 0.1, &#39;n_estimators&#39;: 359, &#39;min_samples_leaf&#39;: 2}
+5: new best: -0.141484028235 {&#39;max_features&#39;: 0.6000000000000001, &#39;n_estimators&#39;: 202, &#39;min_samples_leaf&#39;: 3}
+6: new best: -0.141484028235 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 211, &#39;min_samples_leaf&#39;: 4}
+7: new best: -0.141484028235 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 96, &#39;min_samples_leaf&#39;: 8}
+8: new best: -0.141484028235 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 410, &#39;min_samples_leaf&#39;: 6}
+9: new best: -0.141484028235 {&#39;max_features&#39;: 0.4, &#39;n_estimators&#39;: 372, &#39;min_samples_leaf&#39;: 8}
+10: new best: -0.141433479217 {&#39;max_features&#39;: 0.5, &#39;n_estimators&#39;: 354, &#39;min_samples_leaf&#39;: 2}
+11: new best: -0.141433479217 {&#39;max_features&#39;: 0.2, &#39;n_estimators&#39;: 162, &#39;min_samples_leaf&#39;: 9}
+12: new best: -0.141433479217 {&#39;max_features&#39;: 0.5, &#39;n_estimators&#39;: 484, &#39;min_samples_leaf&#39;: 7}
+13: new best: -0.141433479217 {&#39;max_features&#39;: 0.9, &#39;n_estimators&#39;: 160, &#39;min_samples_leaf&#39;: 6}
+14: new best: -0.141433479217 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 224, &#39;min_samples_leaf&#39;: 6}
+15: new best: -0.141433479217 {&#39;max_features&#39;: 0.1, &#39;n_estimators&#39;: 223, &#39;min_samples_leaf&#39;: 7}
+16: new best: -0.141433479217 {&#39;max_features&#39;: 0.30000000000000004, &#39;n_estimators&#39;: 251, &#39;min_samples_leaf&#39;: 2}
+...
+ best param:  {&#39;max_features&#39;: 0.4, &#39;n_estimators&#39;: 366, &#39;min_samples_leaf&#39;: 0}
+</code></pre><h2 id="Parameters-Visualization"><a href="#Parameters-Visualization" class="headerlink" title="Parameters Visualization"></a>Parameters Visualization</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment"># plot params with socre</span></span><br><span class="line">parameters = trials.trials[<span class="number">0</span>][<span class="string">'misc'</span>][<span class="string">'vals'</span>].keys()</span><br><span class="line">f, axes = plt.subplots(nrows=len(parameters)/<span class="number">3</span>+<span class="number">1</span>, ncols=<span class="number">3</span>, figsize=(<span class="number">15</span>,<span class="number">10</span>))</span><br><span class="line">cmap = plt.cm.jet</span><br><span class="line"><span class="keyword">for</span> i, val <span class="keyword">in</span> enumerate(parameters):</span><br><span class="line">    xs = np.array([t[<span class="string">'misc'</span>][<span class="string">'vals'</span>][val] <span class="keyword">for</span> t <span class="keyword">in</span> trials.trials]).ravel()</span><br><span class="line">    ys = [-t[<span class="string">'result'</span>][<span class="string">'loss'</span>] <span class="keyword">for</span> t <span class="keyword">in</span> trials.trials]</span><br><span class="line">    <span class="comment"># print zip(sorted(zip(xs, ys)))</span></span><br><span class="line">    <span class="comment"># xs, ys = sorted(zip(xs, ys))</span></span><br><span class="line">    </span><br><span class="line">    ys = np.array(ys)</span><br><span class="line">    axes[i/<span class="number">3</span>,i%<span class="number">3</span>].scatter(xs, ys, s=<span class="number">20</span>, linewidth=<span class="number">0.01</span>, alpha=<span class="number">0.5</span>, c=cmap(float(i)/len(parameters)))</span><br><span class="line">    axes[i/<span class="number">3</span>,i%<span class="number">3</span>].set_title(val)</span><br><span class="line">    <span class="comment"># axes[i/3,i%3].set_ylim([0.9,1.0])</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/kaggle-house-price/output_49_0.png" alt="png"></p>
+<hr>
+<h1 id="Prediction"><a href="#Prediction" class="headerlink" title="Prediction"></a>Prediction</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X_predict = df_features_encode.loc[<span class="string">'test'</span>,:].copy()</span><br><span class="line">X_predict.drop(<span class="string">'SalePrice'</span>,axis = <span class="number">1</span>, inplace=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rf = ensemble.RandomForestRegressor(max_features= <span class="number">0.4</span>, n_estimators=<span class="number">366</span>, min_samples_leaf= <span class="number">0</span>)</span><br><span class="line">rf.fit(X_train,y_train)</span><br><span class="line">y_pred = np.exp(rf.predict(X_predict))</span><br><span class="line">pd.Series(y_pred).to_csv(<span class="string">'y_pred2.csv'</span>)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kaggle/" rel="tag"># kaggle</a>
+          
+            <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/01/geometry-relationships-in-postgis/" rel="next" title="PostGIS中的Geometry相互关系">
+                <i class="fa fa-chevron-left"></i> PostGIS中的Geometry相互关系
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/14/geography-deep-learning-docker/" rel="prev" title="深度学习docker环境搭建-地理领域">
+                深度学习docker环境搭建-地理领域 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">sshuair</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sshuair" title="GitHub &rarr; https://github.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://www.zhihu.com/people/sshuair" title="Zhihu &rarr; http://www.zhihu.com/people/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>Zhihu</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://weibo.com/wangs2718" title="Wseibo &rarr; http://weibo.com/wangs2718" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Wseibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sshuair" title="Twitter &rarr; https://twitter.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:sshuair@gmail.com" title="E-Mail &rarr; mailto:sshuair@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Data-Exploration"><span class="nav-number">1.</span> <span class="nav-text">Data Exploration</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Loading-Data"><span class="nav-number">1.1.</span> <span class="nav-text">Loading Data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Basic-Info"><span class="nav-number">1.2.</span> <span class="nav-text">Basic Info</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Checking-for-NANs"><span class="nav-number">1.3.</span> <span class="nav-text">Checking for NANs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Data-Visualization"><span class="nav-number">1.4.</span> <span class="nav-text">Data Visualization</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Data-Preprocessing"><span class="nav-number">2.</span> <span class="nav-text">Data Preprocessing</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Missing-Data"><span class="nav-number">2.1.</span> <span class="nav-text">Missing Data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#encoding-categorical-features"><span class="nav-number">2.2.</span> <span class="nav-text">encoding categorical features</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Training-Model"><span class="nav-number">3.</span> <span class="nav-text">Training Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Feature-Selection"><span class="nav-number">3.1.</span> <span class="nav-text">Feature Selection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tuning-Parameters"><span class="nav-number">3.2.</span> <span class="nav-text">Tuning Parameters</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Parameters-Visualization"><span class="nav-number">3.3.</span> <span class="nav-text">Parameters Visualization</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prediction"><span class="nav-number">4.</span> <span class="nav-text">Prediction</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sshuair</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.5.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.1"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

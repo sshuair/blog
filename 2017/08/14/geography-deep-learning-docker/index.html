@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2"/>
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1"/>
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/favicon-16x16-next.png?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false,"dimmer":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在平时的机器学习和深度学习的工作中，虽然在mac os上用brew配置各种机器学习、深度学习以及地理相关的开发环境比较容易，但是公司的linux上又是另一套安装方法，略显麻烦，对于新来的同事或者实习生也得手把手教一遍配置各种包库，不仅浪费时间，而且新手很容易把环境搞崩掉。平台组的同事已近把docker用于开发中，那么我们是不是也可以把机器学习、深度学习的开发环境打包到docker中呢？当然是可以的">
+<meta name="keywords" content="deep learning,docker,GIS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习docker环境搭建-地理领域">
+<meta property="og:url" content="https://sshuair.xyz/2017/08/14/geography-deep-learning-docker/index.html">
+<meta property="og:site_name" content="sshuair&#39;s notes">
+<meta property="og:description" content="在平时的机器学习和深度学习的工作中，虽然在mac os上用brew配置各种机器学习、深度学习以及地理相关的开发环境比较容易，但是公司的linux上又是另一套安装方法，略显麻烦，对于新来的同事或者实习生也得手把手教一遍配置各种包库，不仅浪费时间，而且新手很容易把环境搞崩掉。平台组的同事已近把docker用于开发中，那么我们是不是也可以把机器学习、深度学习的开发环境打包到docker中呢？当然是可以的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-24T03:34:32.383Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度学习docker环境搭建-地理领域">
+<meta name="twitter:description" content="在平时的机器学习和深度学习的工作中，虽然在mac os上用brew配置各种机器学习、深度学习以及地理相关的开发环境比较容易，但是公司的linux上又是另一套安装方法，略显麻烦，对于新来的同事或者实习生也得手把手教一遍配置各种包库，不仅浪费时间，而且新手很容易把环境搞崩掉。平台组的同事已近把docker用于开发中，那么我们是不是也可以把机器学习、深度学习的开发环境打包到docker中呢？当然是可以的">
+
+
+
+
+
+
+  <link rel="canonical" href="https://sshuair.xyz/2017/08/14/geography-deep-learning-docker/"/>
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深度学习docker环境搭建-地理领域 | sshuair's notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sshuair's notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">书写是为了更好的思考</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br/>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br/>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br/>关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sshuair.xyz/2017/08/14/geography-deep-learning-docker/"/>
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sshuair"/>
+      <meta itemprop="description" content=""/>
+      <meta itemprop="image" content="/images/avatar.gif"/>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sshuair's notes"/>
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度学习docker环境搭建-地理领域
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-08-14 11:05:08" itemprop="dateCreated datePublished" datetime="2017-08-14T11:05:08+08:00">2017-08-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-06-24 11:34:32" itemprop="dateModified" datetime="2018-06-24T11:34:32+08:00">2018-06-24</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在平时的机器学习和深度学习的工作中，虽然在mac os上用brew配置各种机器学习、深度学习以及地理相关的开发环境比较容易，但是公司的linux上又是另一套安装方法，略显麻烦，对于新来的同事或者实习生也得手把手教一遍配置各种包库，不仅浪费时间，而且新手很容易把环境搞崩掉。平台组的同事已近把docker用于开发中，那么我们是不是也可以把机器学习、深度学习的开发环境打包到docker中呢？当然是可以的，TensorFlow、pytorch、caffe等深度学习框架都有自己的官方docker image，虽然可以分开用，但是我们还要用到sk-learn、sk-image、pandas、gdal等其它工具，所以把这些都打包到一个image中不仅用着方便，不用每次在各个docker image之间切换，还能减少总的image的大小，更有助于提高工作效率，不用浪费大量的时间再各种环境的配置上面，真正做到了一次打包四处开发的效果。<br><a id="more"></a></p>
+<h2 id="image与dockerfile"><a href="#image与dockerfile" class="headerlink" title="image与dockerfile"></a>image与dockerfile</h2><p>我这里已近构建好了四个image，已经放到了docker hub上: <strong><a href="https://store.docker.com/community/images/sshuair/dl-satellite" target="_blank" rel="noopener">sshuair/dl-satellite</a></strong>，dockerfile也放到了github上: <strong><a href="https://github.com/sshuair/dl-satellite" target="_blank" rel="noopener">dockerfile链接</a></strong>，感兴趣的童鞋可以在这个基础上再添加其它内容。如果想自己构建镜像推荐使用docker cloud的Automated Builds自动构建镜像，如果在本地构建镜像的话，记得将docker的镜像源换成阿里云的，ubuntu的镜像源也换成阿里云的（替换方法在我的dockerfile中）。</p>
+<p>四个镜像如下包含的东西如下：</p>
+<ol>
+<li>sshuair/dl-satellite:cpu sshuair/dl-satellite:gpu<ul>
+<li>平台：cpu &amp; gpu</li>
+<li>python：3.5</li>
+<li>深度学习库：TensorFlow 1.2.1, mxnet 0.10, pytorch 0.2, keras</li>
+<li>机器学习库：sk-learn, sk-image, xgbost, hyperopt</li>
+<li>地理处理库：mapnik, gdal, shapely, fiona, rasterio等等</li>
+<li>其它科学计算库：pandas, matplotlib, scipy等等</li>
+</ul>
+</li>
+<li>sshuair/dl-satellite:caffe-py2-cpu sshuair/dl-satellite:caffe-py2-gpu<ul>
+<li>平台：cpu &amp; gpu</li>
+<li>python：2.7</li>
+<li>深度学习库：caffe</li>
+<li>机器学习库：sk-learn, sk-image</li>
+<li>地理处理库：mapnik, gdal</li>
+<li>其它科学计算库：pandas, scipy等等</li>
+</ul>
+</li>
+</ol>
+<p>另外有一点需要注意，目前sshuair/dl-satellite:gpu这个image依赖于cudnn6，而我TensorFlow1.2.1支持支cudnn5，因此TensorFlow暂时无法使用gpu版本，不过在下一个版本1.3中将会加入对cudnn6的支持（估计9月初会release正式版）。</p>
+<h2 id="required"><a href="#required" class="headerlink" title="required"></a>required</h2><ul>
+<li><a href="https://docker.com/" target="_blank" rel="noopener">docker</a>: docker的安装可以到其官网查看各种平台的安装方法；</li>
+<li><a href="https://github.com/NVIDIA/nvidia-docker" target="_blank" rel="noopener">nvidia-docker</a>: 为了在使用GPU还需要nvidia官方出的一个docker插件，用来调用GPU资源；</li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>如果仅仅用到cpu那么直接用<code>docker run</code>即可，如果需要调用gpu就需要使用<code>nvidia-docker run</code>进行启动，</p>
+<ol>
+<li><p>新建container<br><code>docker run -it --rm sshuair/dl-satellite:cpu bash</code></p>
+</li>
+<li><p>启用jupyter-Notebook：<br><code>nvidia-docker run -it -p 8888:8888 -p 6006:6006 --rm --name container_name sshuair/dl-satellite:gpu jupyter-notebook --allow-root</code></p>
+</li>
+<li><p>启用tensorboard：<br><code>nvidia-docker run -it -p 8888:8888 -p 6006:6006 --rm --name container_names shuair/dl-satellite:gpu tensorboard --logdir=/workdir</code></p>
+</li>
+</ol>
+<p>更多命令可以到<a href="https://www.gitbook.com/book/yeasy/docker_practice" target="_blank" rel="noopener">Docker—从入门到实战</a>中查阅。</p>
+<h2 id="pycharm调试与代码提示"><a href="#pycharm调试与代码提示" class="headerlink" title="pycharm调试与代码提示"></a>pycharm调试与代码提示</h2><p>在开发的过程中代码提示、debug是必备的，可是在docker中怎么办呢，幸好pycharm提供了对docker的支持，具体使用方法见<a href="https://www.jetbrains.com/help/pycharm/docker.html" target="_blank" rel="noopener">pycharm帮助文档</a>，在配置docker环境时，pycharm会在宿主机器上生成相应的包库所有文件，因此第一次配置的时候会画比较长的时间，后面再开启pycharm时就会很快</p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ol>
+<li>mac os下的image所占空间特别大，删除后不释放空间问题，可以到<a href="https://github.com/docker/for-mac/issues/371" target="_blank" rel="noopener">这里</a>查看@djs55提供的解决方法</li>
+<li>pytorch 0.2版本依赖于numpy 1.3.1，因此在安装pytorch之前需要先升级numpy</li>
+<li>mapnik要在gdal之前安装，不然import mapnik时会报错</li>
+<li>pytorch在Notebook中import时会报错，目前还不清楚是什么原因</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+            <a href="/tags/GIS/" rel="tag"># GIS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/11/kaggle-house-prices/" rel="next" title="kaggle入门之旅：house prices">
+                <i class="fa fa-chevron-left"></i> kaggle入门之旅：house prices
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/21/pytorch-loss/" rel="prev" title="PyTorch中的Loss Fucntion">
+                PyTorch中的Loss Fucntion <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">sshuair</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sshuair" title="GitHub &rarr; https://github.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://www.zhihu.com/people/sshuair" title="Zhihu &rarr; http://www.zhihu.com/people/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>Zhihu</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://weibo.com/wangs2718" title="Wseibo &rarr; http://weibo.com/wangs2718" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Wseibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sshuair" title="Twitter &rarr; https://twitter.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:sshuair@gmail.com" title="E-Mail &rarr; mailto:sshuair@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#image与dockerfile"><span class="nav-number">1.</span> <span class="nav-text">image与dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#required"><span class="nav-number">2.</span> <span class="nav-text">required</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pycharm调试与代码提示"><span class="nav-number">4.</span> <span class="nav-text">pycharm调试与代码提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sshuair</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.5.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.1"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

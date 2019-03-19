@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>sshuair&#39;s notes</title>
+  
+  <subtitle>书写是为了更好的思考</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://sshuair.xyz/"/>
+  <updated>2018-06-24T04:44:16.611Z</updated>
+  <id>https://sshuair.xyz/</id>
+  
+  <author>
+    <name>sshuair</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>2018上半年工作小结-影像深度学习</title>
+    <link href="https://sshuair.xyz/2018/06/24/2018-second-quarter-work-satellite/"/>
+    <id>https://sshuair.xyz/2018/06/24/2018-second-quarter-work-satellite/</id>
+    <published>2018-06-24T03:06:24.000Z</published>
+    <updated>2018-06-24T04:44:16.611Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;随着&lt;a href=&quot;http://wgdc.taibo.cn/lives14&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;WGDC2018&lt;/a&gt;顺利结束，2018上半年的工作也暂告一段落，年后这4个月中，零零散散做了一些深度学习在影像方面的事情，从街景、无人机、遥感影像、火星都有所涉及。正好利用WGDC上的演讲幻灯片稍作修改，做个工作小节。&lt;/p&gt;
+&lt;img src=&quot;/2018/06/24/2018-second-quarter-work-satellite/WGDC2018-imagery2.jpeg&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="总结" scheme="https://sshuair.xyz/tags/%E6%80%BB%E7%BB%93/"/>
+    
+      <category term="deep learning" scheme="https://sshuair.xyz/tags/deep-learning/"/>
+    
+      <category term="satellite" scheme="https://sshuair.xyz/tags/satellite/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>基于深度学习的道路自动化提取</title>
+    <link href="https://sshuair.xyz/2018/03/01/deeplearning-extract-road/"/>
+    <id>https://sshuair.xyz/2018/03/01/deeplearning-extract-road/</id>
+    <published>2018-03-01T08:42:29.000Z</published>
+    <updated>2019-03-19T03:30:07.542Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;当今世界任然有数百万公里甚至更多的道路没有录入到我们的地图中，尤其是在发展中国家更是有大量的道路没有进行数字化，即使是在发大的城市中也有许多道路未能及时更新，而这对于导航、灾害应急都极为重要，而绘制这些发展中国家的道路又比较困难，如果用传统的方式采用线下测绘，或者用人工解译的方式在遥感影像上勾绘，缺点显而易见：投入成本高、绘图周期长、消耗大量的人力物力。&lt;/p&gt;
+&lt;!-- ![](./deeplearning-extract-road/道路更新不及时.jpg) --&gt;
+&lt;img src=&quot;/2018/03/01/deeplearning-extract-road/道路更新不及时.jpg&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="deep learning" scheme="https://sshuair.xyz/tags/deep-learning/"/>
+    
+      <category term="satellite" scheme="https://sshuair.xyz/tags/satellite/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PyTorch中的Loss Fucntion</title>
+    <link href="https://sshuair.xyz/2017/10/21/pytorch-loss/"/>
+    <id>https://sshuair.xyz/2017/10/21/pytorch-loss/</id>
+    <published>2017-10-21T12:05:08.000Z</published>
+    <updated>2018-03-04T12:50:07.804Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;深度学习中的Loss Function有很多，常见的有L1、L2、HingeLoss、CrossEntropy，其最终目的就是计算预测的  $f(x)$ 与真值 $y$ 之间的差别，而优化器的目的就是minimize这个差值，当loss的值稳定后，便是 $f(x)$ 的参数$W$最优的时候。不同的Loss Function适用场景不同，各个深度学习框架实现大同小异，这里用PyTorch来对常见的Loss Function进行阐述。这里先构造一个预测值 $\hat{y}$ 和真值 $y$&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="deep learning" scheme="https://sshuair.xyz/tags/deep-learning/"/>
+    
+      <category term="pytorch" scheme="https://sshuair.xyz/tags/pytorch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深度学习docker环境搭建-地理领域</title>
+    <link href="https://sshuair.xyz/2017/08/14/geography-deep-learning-docker/"/>
+    <id>https://sshuair.xyz/2017/08/14/geography-deep-learning-docker/</id>
+    <published>2017-08-14T03:05:08.000Z</published>
+    <updated>2018-06-24T03:34:32.383Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在平时的机器学习和深度学习的工作中，虽然在mac os上用brew配置各种机器学习、深度学习以及地理相关的开发环境比较容易，但是公司的linux上又是另一套安装方法，略显麻烦，对于新来的同事或者实习生也得手把手教一遍配置各种包库，不仅浪费时间，而且新手很容易把环境搞崩掉。平台组的同事已近把docker用于开发中，那么我们是不是也可以把机器学习、深度学习的开发环境打包到docker中呢？当然是可以的，TensorFlow、pytorch、caffe等深度学习框架都有自己的官方docker image，虽然可以分开用，但是我们还要用到sk-learn、sk-image、pandas、gdal等其它工具，所以把这些都打包到一个image中不仅用着方便，不用每次在各个docker image之间切换，还能减少总的image的大小，更有助于提高工作效率，不用浪费大量的时间再各种环境的配置上面，真正做到了一次打包四处开发的效果。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="deep learning" scheme="https://sshuair.xyz/tags/deep-learning/"/>
+    
+      <category term="docker" scheme="https://sshuair.xyz/tags/docker/"/>
+    
+      <category term="GIS" scheme="https://sshuair.xyz/tags/GIS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kaggle入门之旅：house prices</title>
+    <link href="https://sshuair.xyz/2017/03/11/kaggle-house-prices/"/>
+    <id>https://sshuair.xyz/2017/03/11/kaggle-house-prices/</id>
+    <published>2017-03-11T09:15:15.000Z</published>
+    <updated>2018-03-04T12:49:54.786Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近的工作内容一直围绕着机器学习展开，断断续续看了不少教程，这里正好拿着kaggle的&lt;a href=&quot;https://www.kaggle.com/c/house-prices-advanced-regression-techniques&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;House Prices: Advanced Regression Techniques&lt;/a&gt;练练手，总结一下机器学习的大致流程。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://kaggle2.blob.core.windows.net/competitions/kaggle/5407/media/housesbanner.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;Data-Exploration&quot;&gt;&lt;a href=&quot;#Data-Exploration&quot; class=&quot;headerlink&quot; title=&quot;Data Exploration&quot;&gt;&lt;/a&gt;Data Exploration&lt;/h1&gt;&lt;p&gt;看了许多教程和机器学习的经验，都提到过一句话：&lt;strong&gt;搞机器学习，对数据和业务的认识很重要&lt;/strong&gt;，所以下面就先来看看数据长什么样子，以及数据可视化中常用的方法和工具，python中数据的读取以及处理的瑞士军刀非pandas莫属，而可视化有matplotlib和seaborn两个方便的工具&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="kaggle" scheme="https://sshuair.xyz/tags/kaggle/"/>
+    
+      <category term="machine learning" scheme="https://sshuair.xyz/tags/machine-learning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PostGIS中的Geometry相互关系</title>
+    <link href="https://sshuair.xyz/2016/12/01/geometry-relationships-in-postgis/"/>
+    <id>https://sshuair.xyz/2016/12/01/geometry-relationships-in-postgis/</id>
+    <published>2016-12-01T12:03:15.000Z</published>
+    <updated>2018-01-31T03:04:58.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在二维地理对象中，两两实体之间的关系可以用三种关系表达：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Interior:包含，一个物体在另一个物体中，并且边界不相交&lt;/li&gt;
+&lt;li&gt;Exterior:相离，两个物体谁也不触碰谁&lt;/li&gt;
+&lt;li&gt;Boundary:相切，两个物体既不包含也不相离&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;那么在PostGIS中intersection如何定义呢？即两个相交的对象，其两者之间的关系必然是interior或者boundary，并且有共同的点，这些共有的点就是相交部分。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="GIS" scheme="https://sshuair.xyz/tags/GIS/"/>
+    
+      <category term="PostGIS" scheme="https://sshuair.xyz/tags/PostGIS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>中国，条条大路通哪里？</title>
+    <link href="https://sshuair.xyz/2016/11/30/road2rome/"/>
+    <id>https://sshuair.xyz/2016/11/30/road2rome/</id>
+    <published>2016-11-30T13:55:00.000Z</published>
+    <updated>2018-03-04T12:51:09.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;古语有云:&lt;em&gt;All Roads Lead to Rome&lt;/em&gt;, 我们利用GeoHey提供的最短路径&lt;a href=&quot;https://geohey.com/site/dev/api/routing&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;API&lt;/a&gt;制作了中国版的条条大陆通北京、上海、广州、武汉、成都，以及每个省到自己省会的条条大路通罗马图。全国每隔0.1个经纬度（大约11km）采一个点作为起点，共计96442个起点，每个起点都会生成一条最短路径，重复越多的路径，其线越粗、颜色也越深。在线地图地址:&lt;a href=&quot;http://demo.geohey.com/road2rome&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;roads to rome&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;北京&quot;&gt;&lt;a href=&quot;#北京&quot; class=&quot;headerlink&quot; title=&quot;北京&quot;&gt;&lt;/a&gt;北京&lt;/h2&gt;&lt;!-- ![beijing_3360x2100](road2rome/beijing_3360x2100.png) --&gt;
+&lt;img src=&quot;/2016/11/30/road2rome/beijing_3360x2100.png&quot; title=&quot;[beijing_3360x2100]&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="maps" scheme="https://sshuair.xyz/tags/maps/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>中国村名尾字分布图</title>
+    <link href="https://sshuair.xyz/2016/09/11/ChinaVillgeName/"/>
+    <id>https://sshuair.xyz/2016/09/11/ChinaVillgeName/</id>
+    <published>2016-09-11T11:09:17.000Z</published>
+    <updated>2018-03-04T12:49:11.531Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;中国村名尾字分布图，列举了主要的几个字，包括：&lt;code&gt;村&lt;/code&gt;、&lt;code&gt;庄&lt;/code&gt;、&lt;code&gt;沟&lt;/code&gt;、&lt;code&gt;湾&lt;/code&gt;、&lt;code&gt;山&lt;/code&gt;、&lt;code&gt;山&lt;/code&gt;、&lt;code&gt;屯&lt;/code&gt;、&lt;code&gt;寨&lt;/code&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注：尾字图表示以&lt;code&gt;*&lt;/code&gt;字结尾的分布图，例如王庄，就是以&lt;code&gt;庄&lt;/code&gt;结尾。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;村&quot;&gt;&lt;a href=&quot;#村&quot; class=&quot;headerlink&quot; title=&quot;村&quot;&gt;&lt;/a&gt;村&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/ChinaVillgeName/村.png&quot; alt=&quot;村&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="maps" scheme="https://sshuair.xyz/tags/maps/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://sshuair.xyz/2016/09/10/hello-world/"/>
+    <id>https://sshuair.xyz/2016/09/10/hello-world/</id>
+    <published>2016-09-10T03:45:47.000Z</published>
+    <updated>2018-01-30T15:42:34.222Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;ol&gt;
+&lt;li&gt;hexo install&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>

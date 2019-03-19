@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2"/>
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1"/>
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/favicon-16x16-next.png?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false,"dimmer":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="深度学习中的Loss Function有很多，常见的有L1、L2、HingeLoss、CrossEntropy，其最终目的就是计算预测的  $f(x)$ 与真值 $y$ 之间的差别，而优化器的目的就是minimize这个差值，当loss的值稳定后，便是 $f(x)$ 的参数$W$最优的时候。不同的Loss Function适用场景不同，各个深度学习框架实现大同小异，这里用PyTorch来对常见的L">
+<meta name="keywords" content="deep learning,pytorch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PyTorch中的Loss Fucntion">
+<meta property="og:url" content="https://sshuair.xyz/2017/10/21/pytorch-loss/index.html">
+<meta property="og:site_name" content="sshuair&#39;s notes">
+<meta property="og:description" content="深度学习中的Loss Function有很多，常见的有L1、L2、HingeLoss、CrossEntropy，其最终目的就是计算预测的  $f(x)$ 与真值 $y$ 之间的差别，而优化器的目的就是minimize这个差值，当loss的值稳定后，便是 $f(x)$ 的参数$W$最优的时候。不同的Loss Function适用场景不同，各个深度学习框架实现大同小异，这里用PyTorch来对常见的L">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://sshuair.xyz/2017/10/21/pytorch-loss/WechatIMG320.jpeg">
+<meta property="og:updated_time" content="2018-03-04T12:50:07.804Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PyTorch中的Loss Fucntion">
+<meta name="twitter:description" content="深度学习中的Loss Function有很多，常见的有L1、L2、HingeLoss、CrossEntropy，其最终目的就是计算预测的  $f(x)$ 与真值 $y$ 之间的差别，而优化器的目的就是minimize这个差值，当loss的值稳定后，便是 $f(x)$ 的参数$W$最优的时候。不同的Loss Function适用场景不同，各个深度学习框架实现大同小异，这里用PyTorch来对常见的L">
+<meta name="twitter:image" content="https://sshuair.xyz/2017/10/21/pytorch-loss/WechatIMG320.jpeg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://sshuair.xyz/2017/10/21/pytorch-loss/"/>
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PyTorch中的Loss Fucntion | sshuair's notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sshuair's notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">书写是为了更好的思考</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br/>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br/>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br/>关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sshuair.xyz/2017/10/21/pytorch-loss/"/>
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="sshuair"/>
+      <meta itemprop="description" content=""/>
+      <meta itemprop="image" content="/images/avatar.gif"/>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sshuair's notes"/>
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PyTorch中的Loss Fucntion
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-10-21 20:05:08" itemprop="dateCreated datePublished" datetime="2017-10-21T20:05:08+08:00">2017-10-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-03-04 20:50:07" itemprop="dateModified" datetime="2018-03-04T20:50:07+08:00">2018-03-04</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>深度学习中的Loss Function有很多，常见的有L1、L2、HingeLoss、CrossEntropy，其最终目的就是计算预测的  $f(x)$ 与真值 $y$ 之间的差别，而优化器的目的就是minimize这个差值，当loss的值稳定后，便是 $f(x)$ 的参数$W$最优的时候。不同的Loss Function适用场景不同，各个深度学习框架实现大同小异，这里用PyTorch来对常见的Loss Function进行阐述。这里先构造一个预测值 $\hat{y}$ 和真值 $y$</p>
+<a id="more"></a>
+<h2 id="Cross-Entropy"><a href="#Cross-Entropy" class="headerlink" title="Cross Entropy"></a>Cross Entropy</h2><p>Cross Entropy（也就是交叉熵）来自香农的信息论，简单来说，交叉熵是用来衡量在给定的真实分布$p_k$下，使用非真实分布$q_k$所指定的策略 $f(x)$ 消除系统的不确定性所需要付出的努力的大小。交叉熵的越低说明这个策略越好，我们总是minimize交叉熵，因为交叉熵越小，就证明算法所产生的策略越接近最优策略，也就间接证明我们的算法所计算出的非真实分布越接近真实分布。交叉熵损失函数从信息论的角度来说，其实来自于KL散度，只不过最后推导的新式等价于交叉熵的计算公式：</p>
+<script type="math/tex; mode=display">H(p,q) = -\sum_{k=1}^{N}(p_k*logq_k)</script><p><strong>最大似然估计、Negative Log Liklihood(NLL)、KL散度与Cross Entropy其实是等价的</strong>，都可以进行互相推导，当然MSE也可以用Cross Entropy进行对到出（详见Deep Learning Book P132）。</p>
+<p>Cross Entropy可以用于分类问题，也可以用于语义分割，对于分类问题，其输出层通常为Sigmoid或者Softmax，当然也有可能直接输出加权之后的，而pytorch中与Cross Entropy相关的loss Function包括：</p>
+<ul>
+<li>CrossEntropyLoss: combines LogSoftMax and NLLLoss in one single class，也就是说我们的网络不需要在最后一层加任何输出层，该loss Function为我们打包好了；</li>
+<li>NLLLoss: 也就是negative log likelihood loss，如果需要得到log分布，则需要在网络的最后一层加上LogSoftmax</li>
+<li>NLLLoss2d: 二维的negative log likelihood loss，多用于分割问题</li>
+<li>BCELoss: Binary Cross Entropy，常用于二分类问题，当然也可以用于多分类问题，通常需要在网络的最后一层添加sigmoid进行配合使用，其target也就是$y$值需要进行one hot编码，另外BCELoss还可以用于Multi-label classification</li>
+<li>BCEWithLogitsLoss: 把Sigmoid layer 和 the BCELoss整合到了一起</li>
+<li>KLDivLoss: TODO</li>
+<li>PoissonNLLLoss: TODO</li>
+</ul>
+<p>下面就用PyTorch对上面的Loss Function进行说明</p>
+<h3 id="CrossEntropyLoss"><a href="#CrossEntropyLoss" class="headerlink" title="CrossEntropyLoss"></a>CrossEntropyLoss</h3><p>pytorch中CrossEntropyLoss是通过两个步骤计算出来的，第一步是计算log softmax，第二步是计算cross entropy（或者说是negative log likehood），CrossEntropyLoss不需要在网络的最后一层添加softmax和log层，直接输出全连接层即可。而NLLLoss则需要在定义网络的时候在最后一层添加softmax和log层</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">import</span> torch.autograd <span class="keyword">as</span> autograd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预测值f(x) 构造样本，神经网络输出层</span></span><br><span class="line">inputs_tensor = torch.FloatTensor( [</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]</span><br><span class="line"> ])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 真值y</span></span><br><span class="line">targets_tensor = torch.LongTensor([<span class="number">1</span>,<span class="number">3</span>,<span class="number">2</span>])</span><br><span class="line"><span class="comment"># targets_tensor = torch.LongTensor([1])</span></span><br><span class="line"></span><br><span class="line">inputs_variable = autograd.Variable(inputs_tensor, requires_grad=<span class="keyword">True</span>) </span><br><span class="line">targets_variable = autograd.Variable(targets_tensor)</span><br><span class="line">print(<span class="string">'input tensor(nBatch x nClasses): &#123;&#125;'</span>.format(inputs_tensor.shape))</span><br><span class="line">print(<span class="string">'target tensor shape: &#123;&#125;'</span>.format(targets_tensor.shape))</span><br></pre></td></tr></table></figure>
+<pre><code>input tensor(nBatch x nClasses): torch.Size([3, 5])
+target tensor shape: torch.Size([3])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">loss = nn.CrossEntropyLoss()</span><br><span class="line">output = loss(inputs_variable, targets_variable)</span><br><span class="line"><span class="comment"># output.backward()</span></span><br><span class="line">print(<span class="string">'pytorch 内部实现的CrossEntropyLoss: &#123;&#125;'</span>.format(output))</span><br></pre></td></tr></table></figure>
+<pre><code>pytorch 内部实现的CrossEntropyLoss: Variable containing:
+ 3.7925
+[torch.FloatTensor of size 1]
+</code></pre><p><strong>手动计算</strong></p>
+<p><strong>1.log softmax</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 手动计算log softmax, 计算结果的值域是[0, 1]</span></span><br><span class="line">softmax_result = F.softmax(inputs_variable) <span class="comment">#.sum() #计算softmax</span></span><br><span class="line">print((<span class="string">'softmax_result（sum=1）:&#123;&#125; \n'</span>.format(softmax_result)))</span><br><span class="line">logsoftmax_result = np.log(softmax_result.data)  <span class="comment"># 计算log，以e为底, 计算后所有的值都小于0</span></span><br><span class="line">print(<span class="string">'手动计算 calculate logsoftmax_result:&#123;&#125; \n'</span>.format(logsoftmax_result))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 直接调用F.log_softmax</span></span><br><span class="line">softmax_result = F.log_softmax(inputs_variable)</span><br><span class="line">print(<span class="string">'F.log_softmax calculate logsoftmax_result:&#123;&#125; \n'</span>.format(logsoftmax_result))</span><br></pre></td></tr></table></figure>
+<pre><code>softmax_result（sum=1）:Variable containing:
+ 9.9953e-01  3.3531e-04  1.2335e-04  6.1413e-06  2.2593e-06
+ 2.5782e-01  1.7372e-03  7.0083e-01  3.4892e-02  4.7221e-03
+ 2.2123e-06  1.7926e-02  9.7875e-01  2.4261e-03  8.9251e-04
+[torch.FloatTensor of size 3x5]
+
+
+手动计算 calculate logsoftmax_result:
+-4.6717e-04 -8.0005e+00 -9.0005e+00 -1.2000e+01 -1.3000e+01
+-1.3555e+00 -6.3555e+00 -3.5549e-01 -3.3555e+00 -5.3555e+00
+-1.3021e+01 -4.0215e+00 -2.1476e-02 -6.0215e+00 -7.0215e+00
+[torch.FloatTensor of size 3x5]
+
+
+F.log_softmax calculate logsoftmax_result:
+-4.6717e-04 -8.0005e+00 -9.0005e+00 -1.2000e+01 -1.3000e+01
+-1.3555e+00 -6.3555e+00 -3.5549e-01 -3.3555e+00 -5.3555e+00
+-1.3021e+01 -4.0215e+00 -2.1476e-02 -6.0215e+00 -7.0215e+00
+[torch.FloatTensor of size 3x5]
+</code></pre><p><strong>2.手动计算loss</strong></p>
+<p>pytorch中NLLLoss定义如下：</p>
+<script type="math/tex; mode=display">loss(x, class) = -x[class]</script><p>这里为什么可以这么写呢？下面用第三个样本进行解释</p>
+<p>我们用one-hot编码后，得到真实分布概率的值<script type="math/tex">p_x(or\ p_{model})</script>为(这里一共有5类)：[0,0,1,0,0]</p>
+<p>而模型预测的每一类分布概率，也就是非真实分布的概率$q_x(or\ p_{pred})$为：[2.5782e-01  1.7372e-03  7.0083e-01  3.4892e-02  4.7221e-03] <em>注意：概率要求其结果为1，这里使用的是softmax计算出来的结果，而不是log softmax</em></p>
+<p>那么根据Cross Entroy（交叉熵）: $-\sum_{k=1}^{N}(p_k*logq_k)$</p>
+<p>或者negative log likehood（最大似然）: $-\sum_{i=1}^{m}log(p_{model}(y^i\mid x^i;\theta))$</p>
+<p>将对应项目相乘即可得到最终的loss结果：</p>
+<script type="math/tex; mode=display">
+0 \times log(2.5782 \cdot 10^{-01}) + 
+0 \times log(1.7372\cdot10^{-03}) + 
+0 \times log(7.0083\cdot10^{-01}) +  
+1 \times log(3.4892\cdot10^{-02}) +  
+0 \times log(4.7221\cdot10^{-03}) 
+=
+1 \times log(3.4892\cdot 10^{-02})</script><p>也就恒等于</p>
+<script type="math/tex; mode=display">
+0 \times -1.3555\cdot 10^{+00} + 
+0 \times -6.3555\cdot10^{+00} + 
+1 \times -3.5549\cdot10^{-01} +  
+0 \times -3.3555\cdot10^{+00} +  
+0 \times -5.3555\cdot10^{+00} 
+=
+1 \times -3.3555\cdot 10^{+00}</script><p><strong>由于其他类别都是0，而且真实概率的一定是1，因此可以简化表示为$loss(x, class) = -x[class]$ 在这里也就是$-q_x[2]$</strong> = 3.3555</p>
+<p>下面是分别计算每个样本的交叉熵，最后求平均，可以看到，最终结果和直接调用nn.CrossEntroyLoss的结果相同</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sample_loss1 = -softmax_result[<span class="number">0</span>,<span class="number">1</span>]</span><br><span class="line">sample_loss2 = -softmax_result[<span class="number">1</span>,<span class="number">3</span>]</span><br><span class="line">sample_loss3 = -softmax_result[<span class="number">2</span>,<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">print(sample_loss1.data, sample_loss2.data, sample_loss3.data)</span><br><span class="line">final_loss = (sample_loss1 + sample_loss2 + sample_loss3)/<span class="number">3</span></span><br><span class="line">print(<span class="string">'最终计算Loss结果：'</span>,final_loss)</span><br></pre></td></tr></table></figure>
+<pre><code> 8.0005
+[torch.FloatTensor of size 1]
+
+ 3.3555
+[torch.FloatTensor of size 1]
+
+1.00000e-02 *
+  2.1476
+[torch.FloatTensor of size 1]
+
+最终计算Loss结果： Variable containing:
+ 3.7925
+[torch.FloatTensor of size 1]
+</code></pre><h3 id="NLLLoss"><a href="#NLLLoss" class="headerlink" title="NLLLoss"></a>NLLLoss</h3><p>接着我们把上面计算的log softmax结果作为NLLLoss的输入，可以看到计算结果和CrossEntropyLoss相同</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">inputs_tensor = torch.FloatTensor([</span><br><span class="line">    [<span class="number">-4.6717e-04</span>, <span class="number">-8.0005e+00</span>, <span class="number">-9.0005e+00</span>, <span class="number">-1.2000e+01</span>, <span class="number">-1.3000e+01</span>],</span><br><span class="line">    [<span class="number">-1.3555e+00</span>, <span class="number">-6.3555e+00</span>, <span class="number">-3.5549e-01</span>, <span class="number">-3.3555e+00</span>, <span class="number">-5.3555e+00</span>],</span><br><span class="line">    [<span class="number">-1.3021e+01</span>, <span class="number">-4.0215e+00</span>, <span class="number">-2.1476e-02</span>, <span class="number">-6.0215e+00</span>, <span class="number">-7.0215e+00</span>]</span><br><span class="line">])</span><br><span class="line">    </span><br><span class="line">targets_tensor = torch.LongTensor([<span class="number">1</span>,<span class="number">3</span>,<span class="number">2</span>])</span><br><span class="line"><span class="comment"># targets_tensor = torch.LongTensor([1])</span></span><br><span class="line"></span><br><span class="line">inputs_variable = autograd.Variable(inputs_tensor, requires_grad=<span class="keyword">True</span>)</span><br><span class="line">targets_variable = autograd.Variable(targets_tensor)</span><br><span class="line"></span><br><span class="line">loss = nn.NLLLoss()</span><br><span class="line">output = loss(inputs_variable, targets_variable)</span><br><span class="line">print(<span class="string">'NLLLoss 结果：&#123;&#125;'</span>.format(output))</span><br></pre></td></tr></table></figure>
+<pre><code>NLLLoss 结果：Variable containing:
+ 3.7925
+[torch.FloatTensor of size 1]
+</code></pre><h3 id="NLLLoss2d"><a href="#NLLLoss2d" class="headerlink" title="NLLLoss2d"></a>NLLLoss2d</h3><p>NLLLoss2d用于计算二维的损失函数，与NLLLoss差别在于，NLLLoss输出的是1维向量，NLLLoss2d输出的是二维向量，比如说有20类，那么NLLLoss2d输出的应该是20 x width x height，而对应的真值也是二维的 1 x width x height，在计算loss的时候只需要输出层的每个像素与target真值对应位置的像素进行计算即可，然后再对整张图片的每个像素求loss，最后求和取平均（batch size = 1的情况下），多用于语义分割中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构造样本 假设一共有四种类别，图像大小是5x5的，batch_size是1</span></span><br><span class="line">inputs_tensor = torch.FloatTensor([</span><br><span class="line">[[<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]],</span><br><span class="line">[[<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]],</span><br><span class="line">[[<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]],</span><br><span class="line">[[<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]],</span><br><span class="line">    ])</span><br><span class="line">inputs_tensor = torch.unsqueeze(inputs_tensor,<span class="number">0</span>)</span><br><span class="line"><span class="comment"># inputs_tensor = torch.unsqueeze(inputs_tensor,1)</span></span><br><span class="line">print(<span class="string">'input size(nBatch x nClasses x height x width): '</span>, inputs_tensor.shape)</span><br><span class="line"></span><br><span class="line">targets_tensor = torch.LongTensor([</span><br><span class="line"> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>],</span><br><span class="line"> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>],</span><br><span class="line"> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>],</span><br><span class="line"> [<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line"> [<span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>]</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">targets_tensor = torch.unsqueeze(targets_tensor,<span class="number">0</span>)</span><br><span class="line">print(<span class="string">'target size(nBatch x height x width): '</span>, targets_tensor.shape)</span><br><span class="line"></span><br><span class="line">inputs_variable = autograd.Variable(inputs_tensor, requires_grad=<span class="keyword">True</span>)</span><br><span class="line">inputs_variable = F.log_softmax(inputs_variable) <span class="comment">#计算log softmax</span></span><br><span class="line">targets_variable = autograd.Variable(targets_tensor)</span><br><span class="line"></span><br><span class="line">loss = nn.NLLLoss2d()</span><br><span class="line">output = loss(inputs_variable, targets_variable)</span><br><span class="line">print(<span class="string">'NLLLoss 结果：&#123;&#125;'</span>.format(output))</span><br></pre></td></tr></table></figure>
+<pre><code>input size(nBatch x nClasses x height x width):  torch.Size([1, 4, 5, 5])
+target size(nBatch x height x width):  torch.Size([1, 5, 5])
+NLLLoss 结果：Variable containing:
+ 1.3863
+[torch.FloatTensor of size 1]
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构造样本 假设一共有四种类别，图像大小是2x2的，batch_size是1</span></span><br><span class="line">inputs_tensor = torch.FloatTensor([</span><br><span class="line">[[<span class="number">2</span>, <span class="number">4</span>],</span><br><span class="line"> [<span class="number">1</span>, <span class="number">2</span>]],</span><br><span class="line">[[<span class="number">5</span>, <span class="number">3</span>],</span><br><span class="line"> [<span class="number">3</span>, <span class="number">0</span>]],</span><br><span class="line">[[<span class="number">5</span>, <span class="number">3</span>],</span><br><span class="line"> [<span class="number">5</span>, <span class="number">2</span>]],</span><br><span class="line">[[<span class="number">4</span>, <span class="number">2</span>],</span><br><span class="line"> [<span class="number">3</span>, <span class="number">2</span>]],</span><br><span class="line">    ])</span><br><span class="line">inputs_tensor = torch.unsqueeze(inputs_tensor,<span class="number">0</span>)</span><br><span class="line"><span class="comment"># inputs_tensor = torch.unsqueeze(inputs_tensor,1)</span></span><br><span class="line">print(<span class="string">'input size(nBatch x nClasses x height x width): '</span>, inputs_tensor.shape)</span><br><span class="line"></span><br><span class="line">targets_tensor = torch.LongTensor([</span><br><span class="line"> [<span class="number">0</span>, <span class="number">2</span>],</span><br><span class="line"> [<span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">targets_tensor = torch.unsqueeze(targets_tensor,<span class="number">0</span>)</span><br><span class="line">print(<span class="string">'target size(nBatch x height x width): '</span>, targets_tensor.shape)</span><br><span class="line"></span><br><span class="line">inputs_variable = autograd.Variable(inputs_tensor, requires_grad=<span class="keyword">True</span>)</span><br><span class="line">inputs_variable = F.log_softmax(inputs_variable) <span class="comment">#计算log softmax</span></span><br><span class="line">targets_variable = autograd.Variable(targets_tensor)</span><br><span class="line"></span><br><span class="line">loss = nn.NLLLoss2d()</span><br><span class="line">output = loss(inputs_variable, targets_variable)</span><br><span class="line">print(<span class="string">'NLLLoss 结果：&#123;&#125;'</span>.format(output))</span><br></pre></td></tr></table></figure>
+<pre><code>input size(nBatch x nClasses x height x width):  torch.Size([1, 4, 2, 2])
+target size(nBatch x height x width):  torch.Size([1, 2, 2])
+NLLLoss 结果：Variable containing:
+ 1.7265
+[torch.FloatTensor of size 1]
+</code></pre><p>那么输入到模型中的数据为经过log softmax计算后的结果：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'inputs:&#123;&#125; \n'</span>.format(inputs_variable))</span><br><span class="line">print(<span class="string">'target:&#123;&#125; \n'</span>.format(targets_tensor))</span><br></pre></td></tr></table></figure>
+<pre><code>inputs:Variable containing:
+(0 ,0 ,.,.) = 
+ -3.8828 -0.6265
+ -4.2539 -1.1427
+
+(0 ,1 ,.,.) = 
+ -0.8828 -1.6265
+ -2.2539 -3.1427
+
+(0 ,2 ,.,.) = 
+ -0.8828 -1.6265
+ -0.2539 -1.1427
+
+(0 ,3 ,.,.) = 
+ -1.8828 -2.6265
+ -2.2539 -1.1427
+[torch.FloatTensor of size 1x4x2x2]
+
+
+target:
+(0 ,.,.) = 
+  0  2
+  2  3
+[torch.LongTensor of size 1x2x2]
+</code></pre><p>同样，我们使用与之前计算CrossEntropyLoss中的方式相同，根据target的标签值，对每个像素对应的4个类别位置取出最大值即可，如下图所示<br><!-- ![](/images/pytorch-loss/WechatIMG320.jpeg) --><br><img src="/2017/10/21/pytorch-loss/WechatIMG320.jpeg"></p>
+<p>那么最后的loss计算结果如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算loss 结果</span></span><br><span class="line">-(<span class="number">-3.8828</span> + (<span class="number">-1.6265</span>) + (<span class="number">-0.2539</span>)+ (<span class="number">-1.1427</span>))/<span class="number">4</span></span><br></pre></td></tr></table></figure>
+<pre><code>1.7264749999999998
+</code></pre><h3 id="BCELoss"><a href="#BCELoss" class="headerlink" title="BCELoss"></a>BCELoss</h3><p>BCELoss</p>
+<script type="math/tex; mode=display">loss(o,t)=−{1/N}\sum_{i=1}^{N}=1N[t_i∗log(o_i)+(1−t_i)∗log(1−o_i)]</script><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 预测值f(x) 构造样本，神经网络输出层</span></span><br><span class="line">inputs_tensor = torch.FloatTensor( [</span><br><span class="line"> [<span class="number">10</span>, <span class="number">2</span>, <span class="number">1</span>,<span class="number">-2</span>,<span class="number">-3</span>],</span><br><span class="line"> [<span class="number">-1</span>,<span class="number">-6</span>,<span class="number">-0</span>,<span class="number">-3</span>,<span class="number">-5</span>],</span><br><span class="line"> [<span class="number">-5</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">1</span>]</span><br><span class="line"> ])</span><br><span class="line">inputs_tensor = F.sigmoid(inputs_tensor).data</span><br><span class="line"><span class="comment"># 真值y</span></span><br><span class="line">targets_tensor = torch.LongTensor([</span><br><span class="line"> [<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>],</span><br><span class="line"> [<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>],</span><br><span class="line"> [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>]</span><br><span class="line">])</span><br><span class="line"><span class="comment"># targets_tensor = torch.LongTensor([1])</span></span><br><span class="line"></span><br><span class="line">inputs_variable = autograd.Variable(inputs_tensor, requires_grad=<span class="keyword">True</span>) </span><br><span class="line">targets_variable = autograd.Variable(targets_tensor)</span><br><span class="line">print(<span class="string">'input tensor (nBatch x nClasses): &#123;&#125;'</span>.format(inputs_tensor.shape))</span><br><span class="line">print(<span class="string">'target tensor shape: &#123;&#125;'</span>.format(targets_tensor.shape))</span><br></pre></td></tr></table></figure>
+<pre><code>input tensor (nBatch x nClasses): torch.Size([3, 5])
+target tensor shape: torch.Size([3, 5])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">loss = nn.BCELoss()</span><br><span class="line">output = loss(inputs_variable, targets_variable)</span><br><span class="line"><span class="comment"># output.backward()</span></span><br><span class="line">print(<span class="string">'pytorch 内部实现的CrossEntropyLoss: &#123;&#125;'</span>.format(output))</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Hinge"><a href="#Hinge" class="headerlink" title="Hinge"></a>Hinge</h2><h2 id="L1-amp-L2"><a href="#L1-amp-L2" class="headerlink" title="L1 &amp; L2"></a>L1 &amp; L2</h2><p>L1 与 L2多用于预测问题，也就是说$y$是一个连续的值， </p>
+<p>其中L1定义如下</p>
+<script type="math/tex; mode=display">L1(\hat{y}, y)=1/m∑|\hat{y}_i−y_i|</script><p>L2的定义如下：</p>
+<script type="math/tex; mode=display">L2(\hat{y}, y)=1/m∑|\hat{y}_i−y_i|^2</script><p>其中 $\hat{y}$ 为预测值，$y$ 为真值，$m$为样本个数，下面如果无特殊说明，都用此表示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/14/geography-deep-learning-docker/" rel="next" title="深度学习docker环境搭建-地理领域">
+                <i class="fa fa-chevron-left"></i> 深度学习docker环境搭建-地理领域
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/01/deeplearning-extract-road/" rel="prev" title="基于深度学习的道路自动化提取">
+                基于深度学习的道路自动化提取 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">sshuair</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/sshuair" title="GitHub &rarr; https://github.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://www.zhihu.com/people/sshuair" title="Zhihu &rarr; http://www.zhihu.com/people/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-zhihu"></i>Zhihu</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="http://weibo.com/wangs2718" title="Wseibo &rarr; http://weibo.com/wangs2718" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Wseibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/sshuair" title="Twitter &rarr; https://twitter.com/sshuair" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:sshuair@gmail.com" title="E-Mail &rarr; mailto:sshuair@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cross-Entropy"><span class="nav-number">1.</span> <span class="nav-text">Cross Entropy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CrossEntropyLoss"><span class="nav-number">1.1.</span> <span class="nav-text">CrossEntropyLoss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NLLLoss"><span class="nav-number">1.2.</span> <span class="nav-text">NLLLoss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NLLLoss2d"><span class="nav-number">1.3.</span> <span class="nav-text">NLLLoss2d</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCELoss"><span class="nav-number">1.4.</span> <span class="nav-text">BCELoss</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hinge"><span class="nav-number">2.</span> <span class="nav-text">Hinge</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#L1-amp-L2"><span class="nav-number">3.</span> <span class="nav-text">L1 &amp; L2</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sshuair</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.5.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.1"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
